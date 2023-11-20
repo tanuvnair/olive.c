@@ -1,5 +1,7 @@
 # example.c
 
+---
+
 ```c
 static uint32_t pixels[HEIGHT*WIDTH];
 ```
@@ -12,6 +14,8 @@ The line **`static uint32_t pixels[HEIGHT * WIDTH];`** declares a static 1D arra
 - **`[HEIGHT * WIDTH]`**: This specifies the size of the array. The number of elements is equal to the product of **`HEIGHT`** and **`WIDTH`**. It's important to note that this is a flattened representation of a 2D array, where the elements are arranged sequentially as if the 2D array has been "flattened" into a single dimension.
 
 For example, if **`HEIGHT`** is 600 and **`WIDTH`** is 800, then the array **`pixels`** will have a size of **`600 * 800 = 480,000`** elements.
+
+---
 
 ```c
 void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
@@ -30,9 +34,7 @@ void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
 2. **`for (size_t i = 0; i < width * height; ++i)`**: This is the beginning of a **`for`** loop that iterates over each element in the 1D array of pixels. It uses a loop variable **`i`** initialized to 0 and increments it on each iteration until it reaches the total number of pixels in the image (**`width * height`**).
 3. **`pixels[i] = color;`**: Inside the loop, this line sets the value of the pixel at index **`i`** in the array to the specified color. It uses the loop variable **`i`** to traverse the 1D array as if it were a flattened 2D array.
 
-# PPM Image format:
-
-[PPM image files (utah.edu)](https://my.eng.utah.edu/~cs5610/ppm.html#:~:text=If%20the%20PPM%20magic%20identifier,carriage%20return%20or%20line%20feed.)
+---
 
 ```c
 #define return_defer(value) do {result = (value); goto defer; } while (0)
@@ -43,6 +45,8 @@ void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
 3. **`result = (value);`:** This line assigns the value of the parameter **`value`** to a variable named **`result`**. This assumes that **`result`** is declared somewhere in the surrounding code.
 4. **`goto defer;`:** This line uses the **`goto`** statement to jump to a label named **`defer`**. The **`defer`** label is expected to be defined elsewhere in the code.
 5. **`while (0)`:** This part ensures that the entire block is treated as a single statement, allowing the macro to be used in a way that resembles a function call. The **`while (0)`** construct ensures that the loop runs only once.
+
+---
 
 ```c
 typedef int Errno;
