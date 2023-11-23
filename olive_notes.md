@@ -172,7 +172,7 @@ void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_heigh
     - **`if (x >= 0 && x < (int) pixels_width)`**: Ensures that the calculated x-coordinate is within the width of the pixel array. This check prevents accessing pixels outside the horizontal bounds of the image.
 7. **Setting Pixel Color:**
     - **`pixels[y * pixels_width + x] = color;`**: Sets the color of the pixel at the current (x, y) coordinate to the specified **`color`**. The calculation of the index **`y * pixels_width + x`** is used to convert the two-dimensional coordinates (x, y) into the corresponding one-dimensional index in the pixel array.
-    - Explanation with example
+    - Explanation with example:
         
         The expression **`pixels[y * pixels_width + x]`** is used to map a two-dimensional coordinate **`(x, y)`** to a one-dimensional index in the **`pixels`** array.
         
