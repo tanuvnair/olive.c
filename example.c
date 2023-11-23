@@ -11,9 +11,14 @@
 // Unsigned 32-bit integer which stores the pixels
 static uint32_t pixels[HEIGHT * WIDTH];
 
-int main(void)
-{
-    olivec_fill(pixels, WIDTH, HEIGHT, 0xFF0000FF);
+int main(void) {
+    olivec_fill(pixels, WIDTH, HEIGHT, 0xFF202020);
+
+    size_t rw = 50*4;
+    size_t rh = 30*4;
+
+    olivec_fill_rect(pixels, WIDTH, HEIGHT, WIDTH/2 - rw/2, HEIGHT/2 - rh/2, rw, rh, 0xFF2020FF);
+
     const char *file_path = "output.ppm";
 
     Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);

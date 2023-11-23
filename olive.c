@@ -1,10 +1,8 @@
 #ifndef OLIVE_C_
 #define OLIVE_C_
 
-void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
-{
-    for (size_t i = 0; i < width * height; ++i)
-    {
+void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color) {
+    for (size_t i = 0; i < width * height; ++i) {
         pixels[i] = color;
     }
 }
@@ -13,8 +11,7 @@ typedef int Errno;
 
 #define return_defer(value) do {result = (value); goto defer; } while (0)
 
-Errno olivec_save_to_ppm_file(uint32_t *pixels, size_t width, size_t height, const char *file_path)
-{
+Errno olivec_save_to_ppm_file(uint32_t *pixels, size_t width, size_t height, const char *file_path) {
     int result = 0;
     FILE *f = NULL;
 
@@ -43,6 +40,20 @@ defer:
     if (f)
         fclose(f);
     return 0;
+}
+
+void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, size_t w, size_t h, uint32_t color) {
+    for (int dy = 0; dy < (int) h; ++dy) {
+        int y = y0 + dy;
+        if (y >= 0 && y < (int) pixels_height) {
+            for (int dx = 0; dx < (int) w; ++dx) {
+                int x = x0 + dx;
+                if (x >= 0 && x < (int) pixels_width) {
+                    pixels[y*pixels_width + x] = color;
+                }
+            }
+        }
+    }
 }
 
 #endif // OLIVE_C_
