@@ -1,5 +1,3 @@
-# olive.c
-
 ```c
 #ifndef OLIVE_C_
 #define OLIVE_C_
@@ -195,3 +193,7 @@ void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_heigh
         - **`y`** is 1 (row index).
         
         The expression **`y * pixels_width + x`** calculates the one-dimensional index value in the flattened array:
+        
+        ```diff
+        value = 1 * 6 + 3 = 9
+        ```
