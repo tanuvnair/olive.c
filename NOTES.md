@@ -196,6 +196,73 @@ void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_heigh
         
         The expression **`y * pixels_width + x`** calculates the one-dimensional index value in the flattened array:
 
+```c
+void olivec_fill_circle(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int cx, int cy, size_t r, uint32_t color) {
+    int x1 = cx - (int) r;
+    int y1 = cy - (int) r;
+    int x2 = cx + (int) r;
+    int y2 = cy + (int) r;
+
+    for (int y = y1; y <= y2; y++) {
+        if (y >= 0 && y < (int) pixels_height) {
+            for (int x = x1; x <= x2; x++) {
+                if (x >= 0 && x < (int) pixels_width) {
+                    int dx = x - cx;
+                    int dy = y - cy;
+                    
+                    // sqrt(dx*dx + dy*dy) <= r*r
+                    if (dx*dx + dy*dy <= r*r) {
+                        pixels[y*pixels_width + x] = color;
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+```c
+int x1 = cx - (int) r;
+int y1 = cy - (int) r;
+int x2 = cx + (int) r;
+int y2 = cy + (int) r;
+
+```
+
+These lines calculate the coordinates of a bounding box that contains the entire circle. The circle is defined by its center `(cx, cy)` and radius `r`. The `(x1, y1)` coordinates represent the top-left corner of the bounding box, and `(x2, y2)` represent the bottom-right corner.
+
+```c
+for (int y = y1; y <= y2; y++) {
+    if (y >= 0 && y < (int) pixels_height) {
+        for (int x = x1; x <= x2; x++) {
+            if (x >= 0 && x < (int) pixels_width) {
+                int dx = x - cx;
+                int dy = y - cy;
+
+                // sqrt(dx*dx + dy*dy) <= r*r
+                if (dx*dx + dy*dy <= r*r) {
+                    pixels[y*pixels_width + x] = color;
+                }
+            }
+        }
+    }
+}
+
+```
+
+Now, the code enters a nested loop that iterates through each pixel within the bounding box. Before processing each pixel, it checks if the pixel coordinates `(x, y)` are within the bounds of the pixel array to avoid accessing memory outside the array.
+
+For each valid pixel, it calculates the distance from the pixel to the center of the circle using the formula:
+
+$$
+\text{distance} = \sqrt{(x - cx)^2 + (y - cy)^2}
+
+$$
+
+The code then checks if the calculated distance is less than or equal to the square of the radius (\(r^2\)). This is a optimization that avoids the need for an expensive square root calculation. If the distance is within the circle, the pixel in the pixel array is set to the specified color.
+
+---
+
 # example.c
 
 ```c
@@ -266,6 +333,67 @@ Explanation:
     - If everything succeeds, the function returns `true` to indicate success.
 
 The overall purpose is to generate a checkerboard pattern, save it to a PPM file, and handle any errors that may occur during the process.
+
+---
+
+```c
+bool circle_example(void) {
+    olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);
+
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
+            size_t radius = CELL_WIDTH;
+
+            if (CELL_HEIGHT < radius) radius = CELL_HEIGHT;
+            olivec_fill_circle(pixels, WIDTH, HEIGHT, x*CELL_WIDTH + CELL_WIDTH/2, y*CELL_HEIGHT + CELL_HEIGHT/2, radius/2, FOREGROUND_COLOR);
+        }
+    }
+
+    const char *file_path = "circle.ppm";
+    Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
+    if (err) {
+        fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
+        return false;
+    }
+
+    return true;
+}
+```
+
+1. `olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);`: This function (not provided in the snippet) is likely responsible for filling the entire image with a background color. It seems to initialize the `pixels` array with a background color.
+2. The nested loop:
+    
+    ```c
+    for (int y = 0; y < ROWS; y++) {
+        for (int x = 0; x < COLS; x++) {
+            size_t radius = CELL_WIDTH;
+    
+            if (CELL_HEIGHT < radius) radius = CELL_HEIGHT;
+            olivec_fill_circle(pixels, WIDTH, HEIGHT, x*CELL_WIDTH + CELL_WIDTH/2, y*CELL_HEIGHT + CELL_HEIGHT/2, radius/2, FOREGROUND_COLOR);
+        }
+    }
+    
+    ```
+    
+    This loop iterates through a grid defined by `ROWS` and `COLS`. For each grid cell, it calculates the center coordinates and sets a radius based on the minimum of `CELL_WIDTH` and `CELL_HEIGHT`. It then calls `olivec_fill_circle` to draw a filled circle at the center of the current cell with the specified radius and the `FOREGROUND_COLOR`.
+    
+3. Saving the result to a PPM file:
+    
+    ```c
+    const char *file_path = "circle.ppm";
+    Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
+    if (err) {
+        fprintf(stderr, "ERROR: could not save file %s: %s\\n", file_path, strerror(errno));
+        return false;
+    }
+    
+    ```
+    
+    This code saves the generated image to a PPM file named "circle.ppm" using the `olivec_save_to_ppm_file` function. If there is an error during the saving process, it prints an error message to stderr and returns `false`.
+    
+4. Finally, the function returns `true` if everything executes successfully.
+
+It's worth noting that there are some functions and variables (`olivec_fill`, `olivec_save_to_ppm_file`, `pixels`, `WIDTH`, `HEIGHT`, `BACKGROUND_COLOR`, `CELL_WIDTH`, `CELL_HEIGHT`, `FOREGROUND_COLOR`, `ROWS`, `COLS`, `Errno`) that are referenced but not defined in the provided code snippet. The actual implementation of these elements would be crucial to understanding the full functionality of the program.
 
 ---
 
