@@ -14,11 +14,16 @@
 #define CELL_WIDTH (WIDTH/COLS)
 #define CELL_HEIGHT (HEIGHT/ROWS)
 
+
 #define BACKGROUND_COLOR 0xFF202020
 #define FOREGROUND_COLOR 0xFF2020FF
 
 // Unsigned 32-bit integer which stores the pixels
 static uint32_t pixels[HEIGHT * WIDTH];
+
+void olivec_draw_line(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int x1, int y1, int x2, int y2, uint32_t color) {
+    
+}
 
 bool checker_example(void) {
     olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);
@@ -44,15 +49,22 @@ bool checker_example(void) {
     return true;
 }
 
+float lerpf(float a, float b, float t) {
+    return a + (b - a)*t;
+}
+
 bool circle_example(void) {
     olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);
 
     for (int y = 0; y < ROWS; y++) {
         for (int x = 0; x < COLS; x++) {
+            float u = (float)x/COLS;
+            float v = (float)y/ROWS;
+            float t = (u + v)/2;
+            
             size_t radius = CELL_WIDTH;
-
             if (CELL_HEIGHT < radius) radius = CELL_HEIGHT;
-            olivec_fill_circle(pixels, WIDTH, HEIGHT, x*CELL_WIDTH + CELL_WIDTH/2, y*CELL_HEIGHT + CELL_HEIGHT/2, radius/2, FOREGROUND_COLOR);
+            olivec_fill_circle(pixels, WIDTH, HEIGHT, x*CELL_WIDTH + CELL_WIDTH/2, y*CELL_HEIGHT + CELL_HEIGHT/2, (size_t) lerpf(radius/8, radius/2, t),FOREGROUND_COLOR);
         }
     }
 
