@@ -20,75 +20,6 @@
 // Unsigned 32-bit integer which stores the pixels
 static uint32_t pixels[HEIGHT * WIDTH];
 
-void swap_int(int *a, int *b)
-{
-    int t = *a;
-    *a = *b;
-    *b = t;
-}
-
-void olivec_draw_line(uint32_t *pixels, size_t pixels_width,
-                      size_t pixels_height, int x1, int y1, int x2, int y2,
-                      uint32_t color)
-{
-    // Objective is to get the values of k and c, where k represents the slope and c is the y-intercept.
-    // y = k*x + c
-    // y1 = k*x1 + c -(i)
-    // y2 = k*x2 + c -(ii)
-    // c = y1 - k*x1 -(iii)
-
-    // After Substituting (iii) in (ii)
-    // y2 = k*x2 + y1 - k*x1
-    // y2 = k*(x2 - x1) + y1
-    // y2 - y1 = k*(x2 - x1)
-    /// k = (y2 - y1)/(x2 - x1)
-
-    // c = y1 - k*x1
-    // k = (y2 - y1)/(x2 - x1)
-
-    int dx = x2 - x1;
-    int dy = y2 - y1;
-
-    if (dx != 0)
-    {
-        int c = y1 - dy * x1 / dx;
-
-        if (x1 > x2)
-            swap_int(&x1, &x2);
-        for (int x = x1; x <= x2; ++x)
-        {
-            if (0 <= x && x < (int) pixels_width)
-            {
-                int sy1 = dy * x / dx + c;
-                int sy2 = dy * (x + 1) / dx + c;
-                if (sy1 > sy2) swap_int(&sy1, &sy2);
-                for (int y = sy1; y <= sy2; y++) {
-                    if (0 <= y && y < (int) pixels_height)
-                    {
-                        pixels[y * pixels_width + x] = color;
-                    }
-                }
-            }
-        }
-    }
-    else
-    {
-        int x = x1;
-        if (0 <= x && x < (int) pixels_width)
-        {
-            if (y1 > y2)
-                swap_int(&y1, &y2);
-            for (int y = y1; y <= y2; ++y)
-            {
-                if (0 <= y && y < (int) pixels_height)
-                {
-                    pixels[y * pixels_width + x] = color;
-                }
-            }
-        }
-    }
-}
-
 bool checker_example(void)
 {
     olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);
@@ -161,17 +92,17 @@ bool lines_example(void)
 
     olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH, 0, 0, HEIGHT, FOREGROUND_COLOR);
 
-    olivec_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH/4, HEIGHT, 0xFF20FF20);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH / 4, HEIGHT, 0xFF20FF20);
 
-    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH/4, 0, 0, HEIGHT, 0xFF20FF20);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 4, 0, 0, HEIGHT, 0xFF20FF20);
 
-    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH, 0, WIDTH/4*3, HEIGHT, 0xFF20FF20);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH, 0, WIDTH / 4 * 3, HEIGHT, 0xFF20FF20);
 
-    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH/4*3, 0, WIDTH, HEIGHT, 0xFF20FF20);
-    
-    olivec_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT/2, WIDTH, HEIGHT/2, 0xFFFF2020);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 4 * 3, 0, WIDTH, HEIGHT, 0xFF20FF20);
 
-    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH/2, 0, WIDTH/2, HEIGHT, 0xFFFF2020);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, 0, HEIGHT / 2, WIDTH, HEIGHT / 2, 0xFFFF2020);
+
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, 0, WIDTH / 2, HEIGHT, 0xFFFF2020);
 
     const char *file_path = "lines.ppm";
     Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
