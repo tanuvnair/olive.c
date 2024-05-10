@@ -1,15 +1,9 @@
 #ifndef OLIVE_C_
 #define OLIVE_C_
 
-void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
-{
-    for (size_t i = 0; i < width * height; ++i)
-    {
-        pixels[i] = color;
-    }
-}
-
-typedef int Errno;
+#include <stdio.h>
+#include <stdint.h>
+#include <errno.h>
 
 #define return_defer(value) \
     do                      \
@@ -18,53 +12,43 @@ typedef int Errno;
         goto defer;         \
     } while (0)
 
-Errno olivec_save_to_ppm_file(uint32_t *pixels, size_t width, size_t height, const char *file_path)
+#define OLIVEC_SWAP(T, a, b) \
+    do                       \
+    {                        \
+        T t = a;             \
+        a = b;               \
+        b = t;               \
+    } while (0)
+
+#define OLIVEC_SIGN(T, x) ((T)(x > 0) - (T)(x < 0))
+
+#define OLIVEC_ABS(T, x) (OLIVEC_SIGN(T, x) * (x))
+
+void olivec_fill(uint32_t *pixels, size_t width, size_t height, uint32_t color)
 {
-    int result = 0;
-    FILE *f = NULL;
-
+    for (size_t i = 0; i < width * height; ++i)
     {
-        f = fopen(file_path, "wb");
-        if (f == NULL)
-            return_defer(errno);
-
-        fprintf(f, "P6\n%zu %zu 255\n", width, height);
-        if (ferror(f))
-            return_defer(errno);
-
-        for (size_t i = 0; i < width * height; ++i)
-        {
-            // 0xAABBGGRR
-            uint32_t pixel = pixels[i];
-            uint8_t bytes[3] = {
-                (pixel >> (8 * 0)) & 0xFF,
-                (pixel >> (8 * 1)) & 0xFF,
-                (pixel >> (8 * 2)) & 0xFF,
-            };
-
-            fwrite(bytes, sizeof(bytes), 1, f);
-            if (ferror(f))
-                return_defer(errno);
-        }
+        pixels[i] = color;
     }
-
-defer:
-    if (f)
-        fclose(f);
-    return 0;
 }
 
-void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int x0, int y0, size_t w, size_t h, uint32_t color)
+void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int x1, int y1, int w, int h, uint32_t color)
 {
-    for (int dy = 0; dy < (int)h; ++dy)
+    int x2 = x1 + OLIVEC_SIGN(int, w) * (OLIVEC_ABS(int, w) - 1);
+    if (x1 > x2)
+        OLIVEC_SWAP(int, x1, x2);
+
+    int y2 = y1 + OLIVEC_SIGN(int, h) * (OLIVEC_ABS(int, h) - 1);
+    if (y1 > y2)
+        OLIVEC_SWAP(int, y1, y2);
+
+    for (int y = y1; y <= y2; ++y)
     {
-        int y = y0 + dy;
-        if (y >= 0 && y < (int)pixels_height)
+        if (0 <= y && y < (int)pixels_height)
         {
-            for (int dx = 0; dx < (int)w; ++dx)
+            for (int x = x1; x <= x2; ++x)
             {
-                int x = x0 + dx;
-                if (x >= 0 && x < (int)pixels_width)
+                if (0 <= x && x < (int)pixels_width)
                 {
                     pixels[y * pixels_width + x] = color;
                 }
@@ -75,23 +59,29 @@ void olivec_fill_rect(uint32_t *pixels, size_t pixels_width, size_t pixels_heigh
 
 void olivec_fill_circle(uint32_t *pixels, size_t pixels_width, size_t pixels_height, int cx, int cy, size_t r, uint32_t color)
 {
-    int x1 = cx - (int)r;
-    int y1 = cy - (int)r;
-    int x2 = cx + (int)r;
-    int y2 = cy + (int)r;
+    if (r == 0)
+        return;
 
-    for (int y = y1; y <= y2; y++)
+    int x1 = cx - r;
+    int x2 = cx + r;
+    if (x1 > x2)
+        OLIVEC_SWAP(int, x1, x2);
+
+    int y1 = cy - r;
+    int y2 = cy + r;
+    if (y1 > y2)
+        OLIVEC_SWAP(int, y1, y2);
+
+    for (int y = y1; y <= y2; ++y)
     {
-        if (y >= 0 && y < (int)pixels_height)
+        if (0 <= y && y < (int)pixels_height)
         {
-            for (int x = x1; x <= x2; x++)
+            for (int x = x1; x <= x2; ++x)
             {
-                if (x >= 0 && x < (int)pixels_width)
+                if (0 <= x && x < (int)pixels_width)
                 {
                     int dx = x - cx;
                     int dy = y - cy;
-
-                    // sqrt(dx*dx + dy*dy) <= r*r
                     if (dx * dx + dy * dy <= r * r)
                     {
                         pixels[y * pixels_width + x] = color;
@@ -100,13 +90,6 @@ void olivec_fill_circle(uint32_t *pixels, size_t pixels_width, size_t pixels_hei
             }
         }
     }
-}
-
-void swap_int(int *a, int *b)
-{
-    int t = *a;
-    *a = *b;
-    *b = t;
 }
 
 void olivec_draw_line(uint32_t *pixels, size_t pixels_width,
@@ -136,7 +119,7 @@ void olivec_draw_line(uint32_t *pixels, size_t pixels_width,
         int c = y1 - dy * x1 / dx;
 
         if (x1 > x2)
-            swap_int(&x1, &x2);
+            OLIVEC_SWAP(int, x1, x2);
         for (int x = x1; x <= x2; ++x)
         {
             if (0 <= x && x < (int)pixels_width)
@@ -144,7 +127,7 @@ void olivec_draw_line(uint32_t *pixels, size_t pixels_width,
                 int sy1 = dy * x / dx + c;
                 int sy2 = dy * (x + 1) / dx + c;
                 if (sy1 > sy2)
-                    swap_int(&sy1, &sy2);
+                    OLIVEC_SWAP(int, sy1, sy2);
                 for (int y = sy1; y <= sy2; y++)
                 {
                     if (0 <= y && y < (int)pixels_height)
@@ -161,7 +144,7 @@ void olivec_draw_line(uint32_t *pixels, size_t pixels_width,
         if (0 <= x && x < (int)pixels_width)
         {
             if (y1 > y2)
-                swap_int(&y1, &y2);
+                OLIVEC_SWAP(int, y1, y2);
             for (int y = y1; y <= y2; ++y)
             {
                 if (0 <= y && y < (int)pixels_height)

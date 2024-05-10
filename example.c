@@ -1,8 +1,10 @@
-#include <stdio.h>
-#include <stdint.h>
 #include <stdbool.h>
 #include <errno.h>
 #include <string.h>
+
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
+
 #include "olive.c"
 
 // Constants for the image
@@ -37,10 +39,10 @@ bool checker_example(void)
         }
     }
 
-    const char *file_path = "checker.ppm";
+    const char *file_path = "checker.png";
+    printf("Generated %s\n", file_path);
 
-    Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-    if (err)
+    if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))
     {
         fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
         return false;
@@ -73,9 +75,10 @@ bool circle_example(void)
         }
     }
 
-    const char *file_path = "circle.ppm";
-    Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-    if (err)
+    const char *file_path = "circle.png";
+    printf("Generated %s\n", file_path);
+
+    if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))
     {
         fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
         return false;
@@ -104,13 +107,15 @@ bool lines_example(void)
 
     olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, 0, WIDTH / 2, HEIGHT, 0xFFFF2020);
 
-    const char *file_path = "lines.ppm";
-    Errno err = olivec_save_to_ppm_file(pixels, WIDTH, HEIGHT, file_path);
-    if (err)
+    const char *file_path = "lines.png";
+    printf("Generated %s\n", file_path);
+
+    if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))
     {
         fprintf(stderr, "ERROR: could not save file %s: %s\n", file_path, strerror(errno));
         return false;
     }
+
     return true;
 }
 
@@ -122,5 +127,6 @@ int main(void)
         return -1;
     if (!lines_example())
         return -1;
+
     return 0;
 }
