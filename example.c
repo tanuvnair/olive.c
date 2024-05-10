@@ -18,6 +18,8 @@
 #define BACKGROUND_COLOR 0xFF202020
 #define FOREGROUND_COLOR 0xFF2020FF
 
+#define IMGS_DIR_PATH "./imgs"
+
 // Unsigned 32-bit integer which stores the pixels
 static uint32_t pixels[HEIGHT * WIDTH];
 
@@ -38,7 +40,7 @@ bool checker_example(void)
         }
     }
 
-    const char *file_path = "checker.png";
+    const char *file_path = IMGS_DIR_PATH"/checker.png";
     printf("Generated %s\n", file_path);
 
     if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))
@@ -74,7 +76,7 @@ bool circle_example(void)
         }
     }
 
-    const char *file_path = "circle.png";
+    const char *file_path = IMGS_DIR_PATH"/circle.png";
     printf("Generated %s\n", file_path);
 
     if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))
@@ -106,7 +108,7 @@ bool lines_example(void)
 
     olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH / 2, 0, WIDTH / 2, HEIGHT, 0xFFFF2020);
 
-    const char *file_path = "lines.png";
+    const char *file_path = IMGS_DIR_PATH"/lines.png";
     printf("Generated %s\n", file_path);
 
     if (!stbi_write_png(file_path, WIDTH, HEIGHT, 4, pixels, WIDTH * sizeof(uint32_t)))

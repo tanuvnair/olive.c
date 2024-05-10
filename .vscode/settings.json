@@ -5,6 +5,7 @@
         "cstdint": "c",
         "string.h": "c",
         "stdio.h": "c",
-        "stdbool.h": "c"
+        "stdbool.h": "c",
+        "stb_image_write.h": "c"
     }
 }
