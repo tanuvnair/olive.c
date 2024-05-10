@@ -7,7 +7,6 @@
 
 #include "olive.c"
 
-// Constants for the image
 #define WIDTH 800
 #define HEIGHT 600
 

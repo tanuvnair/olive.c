@@ -5,13 +5,6 @@
 #include <stdint.h>
 #include <errno.h>
 
-#define return_defer(value) \
-    do                      \
-    {                       \
-        result = (value);   \
-        goto defer;         \
-    } while (0)
-
 #define OLIVEC_SWAP(T, a, b) \
     do                       \
     {                        \
