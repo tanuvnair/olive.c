@@ -10,6 +10,7 @@
         "typeinfo": "c",
         "stdlib.h": "c",
         "errno.h": "c",
-        "stdint.h": "c"
+        "stdint.h": "c",
+        "type_traits": "c"
     }
 }

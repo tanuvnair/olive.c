@@ -18,16 +18,13 @@
         result = (value);   \
         goto defer;         \
     } while (0)
-
 #define UNUSED(x) (void)(x)
-
 #define UNIMPLEMENTED(message)                                                      \
     do                                                                              \
     {                                                                               \
         fprintf(stderr, "%s:%d: UNIMPLEMENTED: %s\n", __FILE__, __LINE__, message); \
         exit(1);                                                                    \
     } while (0)
-
 #define UNREACHABLE(message)                                                      \
     do                                                                            \
     {                                                                             \
@@ -45,6 +42,31 @@
 #define ERROR_COLOR 0xFFFF00FF
 
 #define TEST_DIR_PATH "./test"
+
+char hexchar(uint8_t x)
+{
+    if (x < 10)
+        return x + '0';
+    if (x < 16)
+        return x - 10 + 'A';
+    UNREACHABLE("hexchar");
+}
+
+const char *display_hexcolor(uint32_t c)
+{
+    static char buffer[1 + 8 + 1];
+    buffer[0] = '#';
+    buffer[1] = hexchar((c >> (1 * 4)) & 0xF);
+    buffer[2] = hexchar((c >> (0 * 4)) & 0xF);
+    buffer[3] = hexchar((c >> (3 * 4)) & 0xF);
+    buffer[4] = hexchar((c >> (2 * 4)) & 0xF);
+    buffer[5] = hexchar((c >> (5 * 4)) & 0xF);
+    buffer[6] = hexchar((c >> (4 * 4)) & 0xF);
+    buffer[7] = hexchar((c >> (7 * 4)) & 0xF);
+    buffer[8] = hexchar((c >> (6 * 4)) & 0xF);
+    buffer[9] = '\0';
+    return buffer;
+}
 
 uint32_t pixels[WIDTH * HEIGHT];
 
@@ -72,7 +94,7 @@ bool replay_test_case(const char *program_path, const char *file_path, const cha
             fprintf(stderr, "%s: TEST FAILURE: could not read the file: %s\n", file_path, strerror(errno));
             if (errno == ENOENT)
             {
-                fprintf(stderr, "%s: HINT: Consider running `%s record` to create it\n", file_path, program_path);
+                fprintf(stderr, "%s: HINT: Consider running `$ %s record` to create it\n", file_path, program_path);
             }
             return_defer(false);
         }
@@ -108,7 +130,8 @@ bool replay_test_case(const char *program_path, const char *file_path, const cha
             }
             else
             {
-                printf("See image diff %s for more info\n", failure_file_path);
+                fprintf(stderr, "%s: HINT: See image diff %s for more info. The pixels with color %s are the ones that differ from the expected ones.\n", file_path, failure_file_path, display_hexcolor(ERROR_COLOR));
+                fprintf(stderr, "%s: HINT: If this behaviour is intentional confirm that by updating the image with `$ %s record`\n", file_path, program_path);
             }
             return_defer(false);
         }
@@ -156,7 +179,8 @@ void test_draw_line(void)
 {
     olivec_fill(pixels, WIDTH, HEIGHT, BACKGROUND_COLOR);
     olivec_draw_line(pixels, WIDTH, HEIGHT, 0, 0, WIDTH, HEIGHT, RED_COLOR);
-    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH, 0, 0, HEIGHT, RED_COLOR);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH, 0, 0, HEIGHT, BLUE_COLOR);
+    olivec_draw_line(pixels, WIDTH, HEIGHT, WIDTH/2, 0, WIDTH/2, HEIGHT, GREEN_COLOR);
 }
 
 Test_Case test_cases[] = {
@@ -164,7 +188,6 @@ Test_Case test_cases[] = {
     DEFINE_TEST_CASE(test_fill_circle),
     DEFINE_TEST_CASE(test_draw_line),
 };
-
 #define TEST_CASES_COUNT (sizeof(test_cases) / sizeof(test_cases[0]))
 
 int main(int argc, char **argv)
