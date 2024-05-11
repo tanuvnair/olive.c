@@ -9,6 +9,7 @@
         "stb_image_write.h": "c",
         "typeinfo": "c",
         "stdlib.h": "c",
-        "errno.h": "c"
+        "errno.h": "c",
+        "stdint.h": "c"
     }
 }
