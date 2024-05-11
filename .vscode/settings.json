@@ -6,6 +6,9 @@
         "string.h": "c",
         "stdio.h": "c",
         "stdbool.h": "c",
-        "stb_image_write.h": "c"
+        "stb_image_write.h": "c",
+        "typeinfo": "c",
+        "stdlib.h": "c",
+        "errno.h": "c"
     }
 }

@@ -18,7 +18,7 @@
 #define BACKGROUND_COLOR 0xFF202020
 #define FOREGROUND_COLOR 0xFF2020FF
 
-#define IMGS_DIR_PATH "../imgs"
+#define IMGS_DIR_PATH "./imgs"
 
 // Unsigned 32-bit integer which stores the pixels
 static uint32_t pixels[HEIGHT * WIDTH];
