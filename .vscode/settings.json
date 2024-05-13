@@ -11,6 +11,8 @@
         "stdlib.h": "c",
         "errno.h": "c",
         "stdint.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "system_error": "c",
+        "random": "c"
     }
 }
